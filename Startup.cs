@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using HoNoSoFt.PushChartToConfluence.Sample.Extensions;
+using HoNoSoFt.PushChartToConfluence.Sample.Configurations;
 
 namespace HoNoSoFt.PushChartToConfluence.Sample
 {
@@ -16,10 +17,10 @@ namespace HoNoSoFt.PushChartToConfluence.Sample
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            Configuration = (IConfigurationRoot)configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -59,10 +60,11 @@ namespace HoNoSoFt.PushChartToConfluence.Sample
                     options.EnableForHttps = true;
                 });
 
+            services.AddHttpClient();
             services.AddSpaStaticFiles(config => { config.RootPath = "wwwroot/"; });
 
             // Example with dependency injection for a data provider.
-            services.AddWeather();
+            services.Configure<ConfluenceConfig>(Configuration.GetSection("Confluence"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

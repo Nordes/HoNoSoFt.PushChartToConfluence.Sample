@@ -132,7 +132,7 @@ export default {
         }
 
         // Post the file
-        ctx.$http.post('/api/images', data, config)
+        ctx.$http.post('/api/images/bis', data, config)
       }, "image/png", 0.95);
     }
   }
