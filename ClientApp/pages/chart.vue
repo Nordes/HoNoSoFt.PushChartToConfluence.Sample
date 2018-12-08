@@ -126,13 +126,13 @@ export default {
 
         // Prepare the form post
         var data = new FormData()
-        data.append('file', blob, "snapshot.png")
+        data.append('file', blob, `${ctx.chartConfig.options.title.text}.png`)
         const config = {
             headers: { 'content-type': 'multipart/form-data' }
         }
 
         // Post the file
-        ctx.$http.post('/api/images/bis', data, config)
+        ctx.$http.post('/api/images/confluence/67657373', data, config)
       }, "image/png", 0.95);
     }
   }

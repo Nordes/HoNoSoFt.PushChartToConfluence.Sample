@@ -1,0 +1,131 @@
+using System;
+
+namespace HoNoSoFt.PushChartToConfluence.Sample.Models.Confluence.Attachment
+{
+    public partial class FileSearch
+    {
+        public Result[] Results { get; set; }
+        public long Start { get; set; }
+        public long Limit { get; set; }
+        public long Size { get; set; }
+        public FileSearchLinks Links { get; set; }
+    }
+
+    public partial class FileSearchLinks
+    {
+        public Uri Base { get; set; }
+        public string Context { get; set; }
+        public Uri Self { get; set; }
+    }
+
+    public partial class Result
+    {
+        public string Id { get; set; }
+        public string Type { get; set; }
+        public string Status { get; set; }
+        public string Title { get; set; }
+        public Version Version { get; set; }
+        public Metadata Metadata { get; set; }
+        public Extensions Extensions { get; set; }
+        public ResultExpandable Expandable { get; set; }
+        public ResultLinks Links { get; set; }
+    }
+
+    public partial class ResultExpandable
+    {
+        public string Container { get; set; }
+        public string Operations { get; set; }
+        public string Children { get; set; }
+        public string Restrictions { get; set; }
+        public string History { get; set; }
+        public string Ancestors { get; set; }
+        public string Body { get; set; }
+        public string Descendants { get; set; }
+        public string Space { get; set; }
+    }
+
+    public partial class Extensions
+    {
+        public string MediaType { get; set; }
+        public long FileSize { get; set; }
+        public string Comment { get; set; }
+    }
+
+    public partial class ResultLinks
+    {
+        public Uri Self { get; set; }
+        public string Webui { get; set; }
+        public string Download { get; set; }
+    }
+
+    public partial class Metadata
+    {
+        public string Comment { get; set; }
+        public string MediaType { get; set; }
+        public Labels Labels { get; set; }
+        public MetadataExpandable Expandable { get; set; }
+    }
+
+    public partial class MetadataExpandable
+    {
+        public string Currentuser { get; set; }
+        public string Properties { get; set; }
+        public string Frontend { get; set; }
+        public string EditorHtml { get; set; }
+    }
+
+    public partial class Labels
+    {
+        public object[] Results { get; set; }
+        public long Start { get; set; }
+        public long Limit { get; set; }
+        public long Size { get; set; }
+        public LabelsLinks Links { get; set; }
+    }
+
+    public partial class LabelsLinks
+    {
+        public Uri Self { get; set; }
+    }
+
+    public partial class Version
+    {
+        public By By { get; set; }
+        public DateTimeOffset When { get; set; }
+        public string Message { get; set; }
+        public long Number { get; set; }
+        public bool MinorEdit { get; set; }
+        public bool Hidden { get; set; }
+        public VersionExpandable Expandable { get; set; }
+        public LabelsLinks Links { get; set; }
+    }
+
+    public partial class By
+    {
+        public string Type { get; set; }
+        public string Username { get; set; }
+        public string UserKey { get; set; }
+        public ProfilePicture ProfilePicture { get; set; }
+        public string DisplayName { get; set; }
+        public ByExpandable Expandable { get; set; }
+        public LabelsLinks Links { get; set; }
+    }
+
+    public partial class ByExpandable
+    {
+        public string Status { get; set; }
+    }
+
+    public partial class ProfilePicture
+    {
+        public string Path { get; set; }
+        public long Width { get; set; }
+        public long Height { get; set; }
+        public bool IsDefault { get; set; }
+    }
+
+    public partial class VersionExpandable
+    {
+        public string Content { get; set; }
+    }
+}

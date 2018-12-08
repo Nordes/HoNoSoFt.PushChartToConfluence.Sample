@@ -1,10 +1,8 @@
 const messages = {
   route: {
     home: 'Home',
-    counter: 'Counter',
-    fetchData: 'Fetch-data',
-    extraStuff: 'Extra Stuff',
-    about: 'About'
+    about: 'About',
+    chart: '=====> ChartJs <====='
   },
   cookieConsent: {
     message: 'This website is using cookies.',
