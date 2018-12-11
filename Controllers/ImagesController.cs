@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace HoNoSoFt.PushChartToConfluence.Sample.Controllers
@@ -44,7 +46,6 @@ namespace HoNoSoFt.PushChartToConfluence.Sample.Controllers
             {
                 // full path to file in temp location
                 var filePath = Path.GetTempFileName();
-                fileList.Add(filePath);
                 if (formFile.Length > 0)
                 {
                     // Form file length: {formFile.Length}
@@ -52,6 +53,7 @@ namespace HoNoSoFt.PushChartToConfluence.Sample.Controllers
                     {
                         // Save to file...
                         await formFile.CopyToAsync(stream);
+                        fileList.Add(filePath);
                     }
                 }
             }
@@ -62,8 +64,10 @@ namespace HoNoSoFt.PushChartToConfluence.Sample.Controllers
         }
 
         /// <summary>
-        /// This will save the image in your local "temp" folder.
+        /// Receive 1 or more images to be sent to Confluence server.
         /// </summary>
+        /// <param name="formCollection">The form data (only files are being consumed)</param>
+        /// <param name="pageId">The confluence page Id</param>
         /// <remarks>
         /// More details can be found at https://developer.atlassian.com/server/confluence/confluence-rest-api-examples/
         /// </remarks>
@@ -140,27 +144,31 @@ namespace HoNoSoFt.PushChartToConfluence.Sample.Controllers
         private async Task<FileTransferResult> ForwardFileToConfluence(int pageId, IFormFile formFile)
         {
             // Start getting if attachment exists
-            var getIfAttachmentExists = _confluenceHttpClient.GetAsync($"content/{pageId}/child/attachment?filename={formFile.FileName}&expand=version").ConfigureAwait(false);
-            // While previous request goes on, let's get the file.
-            byte[] data;
-            using (var br = new BinaryReader(formFile.OpenReadStream()))
+            // Confluence require a particular encoding for the string. UrlEncode is not good enough, so better use the most
+            // aggressive encoding/escaping.
+            var encodedFilename = Uri.EscapeDataString(formFile.FileName);
+            var getIfAttachmentExists = _confluenceHttpClient.GetAsync($"content/{pageId}/child/attachment?filename={encodedFilename}&expand=version").ConfigureAwait(false);
+
+            // Forward the stream to our new multipart form data
+            var image = new StreamContent(formFile.OpenReadStream());
+            image.Headers.ContentType = new MediaTypeHeaderValue(formFile.ContentType);
+
+            MultipartFormDataContent multipartContent = new MultipartFormDataContent
             {
-                data = br.ReadBytes((int)formFile.OpenReadStream().Length);
-            }
+                { image, "file", formFile.FileName }
+            };
 
-            ByteArrayContent bytes = new ByteArrayContent(data);
-            MultipartFormDataContent multipartContent = new MultipartFormDataContent();
-            multipartContent.Add(bytes, "file", formFile.FileName);
-
+            // Ensure that we have received the content from the API Call.
             var attachmentRequestData = await getIfAttachmentExists;
             if (attachmentRequestData.IsSuccessStatusCode && attachmentRequestData.StatusCode == HttpStatusCode.OK)
             {
-                // Page exists and no errors...
+                // Page exists and no errors
                 var attachmentRequestContent = await attachmentRequestData.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var attachmentData = JsonConvert.DeserializeObject<FileSearch>(attachmentRequestContent);
 
                 HttpResponseMessage putAttachmentResponse;
-                // Update existing data.
+
+                // Update existing data
                 if (attachmentData.Size == 1)
                 {
                     multipartContent.Add(new StringContent($"Automatic update/upload from TestApplication ;)."), "comment");

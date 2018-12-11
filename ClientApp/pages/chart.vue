@@ -10,16 +10,29 @@
 <script>
 // Import ChartJS
 import Chart from 'chart.js'
+
 // Colors
-var chartColors = [
-  'rgb(255, 99, 132)',
-  'rgb(255, 159, 64)',
-  'rgb(255, 205, 86)',
-  'rgb(75, 192, 192)',
-  'rgb(54, 162, 235)',
-  'rgb(153, 102, 255)',
-  'rgb(201, 203, 207)'
-]
+var chartColors = [ 'rgb(255, 99, 132)', 'rgb(255, 159, 64)', 'rgb(255, 205, 86)', 'rgb(75, 192, 192)', 'rgb(54, 162, 235)', 'rgb(153, 102, 255)', 'rgb(201, 203, 207)' ]
+
+Chart.pluginService.register({
+  beforeDraw: function (chart, easing) {
+    if (chart.config.options.chartArea && chart.config.options.chartArea.backgroundColor) {
+      var ctx = chart.chart.ctx;
+
+      ctx.save();
+      ctx.fillStyle = chart.config.options.chartArea.backgroundColor;
+      // Paint only the back of the chart
+      ////var chartArea = chart.chartArea;
+      ////ctx.fillRect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
+
+      // Paint the full chart background.
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+      ctx.restore();
+    }
+  }
+});
+
 export default {
   data () {
     return {
@@ -31,6 +44,9 @@ export default {
           datasets: []
         },
         options: {
+          chartArea: {
+            backgroundColor: "white"
+          },
           responsive: true,
           maintainAspectRatio: false,
           title: {
@@ -118,8 +134,8 @@ export default {
       this.chart.resize()
       var ctx = this
 
-      // Do snapshot
-      let myImg = this.$refs.chart.toBlob(function (blob) {
+      // Do the Snapshot
+      this.$refs.chart.toBlob(function (blob) {
         // Resize to original size
         ctx.$refs.chartContainer.style.width = ""
         ctx.chart.resize()
